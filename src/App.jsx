@@ -150,8 +150,32 @@ async function loadDashboardData() {
       const allPlansRes = await apiCall({ action: 'load_all', week: currentMonday });
       if (!allPlansRes) return;
 
-      const plansData = allPlansRes.plans || allPlansRes || {};
-      setPlans(plansData);
+      const rawPlans = allPlansRes.plans || allPlansRes || {};
+const normalizedPlans = {};
+
+if (Array.isArray(rawPlans)) {
+  rawPlans.forEach(p => {
+    let s = p.slots || p.slots_json;
+    if (typeof s === 'string') { try { s = JSON.parse(s); } catch(e) { s = []; } }
+    if (p.teacher || p.teacher_id || p.id) {
+      normalizedPlans[String(p.teacher || p.teacher_id || p.id)] = s;
+    }
+  });
+} else if (typeof rawPlans === 'object') {
+  Object.keys(rawPlans).forEach(key => {
+    let item = rawPlans[key];
+    if (typeof item === 'string') { try { item = JSON.parse(item); } catch(e) { item = []; } }
+    if (item && item.slots) {
+      let s = item.slots;
+      if (typeof s === 'string') { try { s = JSON.parse(s); } catch(e) { s = []; } }
+      normalizedPlans[key] = s;
+    } else if (Array.isArray(item)) {
+      normalizedPlans[key] = item;
+    }
+  });
+}
+
+setPlans(normalizedPlans);
 
     } catch (err) {
       console.error('Erro no Dashboard:', err.message);
@@ -171,7 +195,12 @@ async function loadDashboardData() {
   }
 
   function openEditModal(teacher) {
-    const currentSlots = plans[teacher.id] || plans[teacher.nome] || plans[String(teacher.id)] || Array(10).fill('');
+    let currentSlots = plans[teacher.id] || plans[teacher.nome] || plans[String(teacher.id)] || Array(10).fill('');
+    if (typeof currentSlots === 'string') {
+      try { currentSlots = JSON.parse(currentSlots); } catch (e) { currentSlots = Array(10).fill(''); }
+    }
+    if (!Array.isArray(currentSlots)) currentSlots = Array(10).fill('');
+    
     setEditingTeacher(teacher);
     setEditSlots([...currentSlots]);
   }
@@ -228,11 +257,16 @@ async function loadDashboardData() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
           {teachers.map((teacher) => {
-            const slots = plans[teacher.id] || 
-              plans[String(teacher.id)] || 
-              plans[Number(teacher.id)] || 
-              plans[teacher.nome] || 
-              Array(10).fill('');
+            let rawSlots = plans[teacher.id] || 
+                           plans[String(teacher.id)] || 
+                           plans[Number(teacher.id)] || 
+                           plans[teacher.nome] || 
+                           Array(10).fill('');
+
+            if (typeof rawSlots === 'string') {
+              try { rawSlots = JSON.parse(rawSlots); } catch (e) { rawSlots = Array(10).fill(''); }
+            }
+            const slots = Array.isArray(rawSlots) ? rawSlots : Array(10).fill('');
             const isFilled = slots.length === 10 && slots.every(s => s && s !== '');
 
             return (
@@ -433,7 +467,12 @@ export default function App() {
       const data = await apiCall({ action: 'load', teacher: teacherId, week: week });
       if (!data) return; // Se a requisição foi cancelada, encerra sem dar erro
 
-      setSlots(data.slots || Array(10).fill(''));
+      let rawSlots = data.slots;
+      if (typeof rawSlots === 'string') {
+        try { rawSlots = JSON.parse(rawSlots); } catch (e) { rawSlots = Array(10).fill(''); }
+      }
+
+      setSlots(Array.isArray(rawSlots) ? rawSlots : Array(10).fill(''));
       setRevision(data.revision || 0);
       setIsLocked(Boolean(data.isLocked));
       setIsDirty(false);
@@ -483,46 +522,50 @@ export default function App() {
     setIsDirty(true);
   }
 
-async function handleCopyPreviousWeek() {
-    if (!selectedTeacher) {
-      alert('Selecione um formador primeiro.');
-      return;
-    }
-    if (isLocked) {
-      alert('Este planejamento já foi enviado e não pode ser alterado.');
-      return;
-    }
+      async function handleCopyPreviousWeek() {
+          if (!selectedTeacher) {
+            alert('Selecione um formador primeiro.');
+            return;
+          }
+          if (isLocked) {
+            alert('Este planejamento já foi enviado e não pode ser alterado.');
+            return;
+          }
 
-    const [year, month, day] = currentMonday.split('-').map(Number);
-    const prevDate = new Date(year, month - 1, day);
-    prevDate.setDate(prevDate.getDate() - 7);
-    const pYear = prevDate.getFullYear();
-    const pMonth = String(prevDate.getMonth() + 1).padStart(2, '0');
-    const pDay = String(prevDate.getDate()).padStart(2, '0');
-    const prevMonday = `${pYear}-${pMonth}-${pDay}`;
+          const [year, month, day] = currentMonday.split('-').map(Number);
+          const prevDate = new Date(year, month - 1, day);
+          prevDate.setDate(prevDate.getDate() - 7);
+          const pYear = prevDate.getFullYear();
+          const pMonth = String(prevDate.getMonth() + 1).padStart(2, '0');
+          const pDay = String(prevDate.getDate()).padStart(2, '0');
+          const prevMonday = `${pYear}-${pMonth}-${pDay}`;
 
-    setLoading(true);
-    try {
-      const data = await apiCall({ action: 'load', teacher: selectedTeacher, week: prevMonday });
-      
-      // TRATAMENTO CASO A REQUISIÇÃO SEJA ABORTADA
-      if (!data) return;
+          setLoading(true);
+          try {
+            const data = await apiCall({ action: 'load', teacher: selectedTeacher, week: prevMonday });
+            
+            if (!data) return;
 
-      if (!data.slots || data.slots.every(s => !s)) {
-        alert('A semana anterior está vazia.');
-        return;
-      }
+            let rawSlots = data.slots;
+            if (typeof rawSlots === 'string') {
+              try { rawSlots = JSON.parse(rawSlots); } catch (e) { rawSlots = Array(10).fill(''); }
+            }
+            const prevSlots = Array.isArray(rawSlots) ? rawSlots : Array(10).fill('');
 
-      setSlots(data.slots);
-      setIsDirty(true);
-      alert('Semana anterior copiada para a tela. Lembre-se de salvar.');
-    } catch (err) {
-      alert(`Erro ao copiar: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  }
+            if (prevSlots.every(s => !s)) {
+              alert('A semana anterior está vazia.');
+              return;
+            }
 
+            setSlots(prevSlots);
+            setIsDirty(true);
+            alert('Semana anterior copiada para a tela. Lembre-se de salvar.');
+          } catch (err) {
+            alert(`Erro ao copiar: ${err.message}`);
+          } finally {
+            setLoading(false);
+          }
+        }
   async function handleSave() {
     if (!selectedTeacher) {
       alert('Selecione o seu nome de formador.');
