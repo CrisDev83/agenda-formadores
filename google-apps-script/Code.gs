@@ -1,8 +1,14 @@
+var SPREADSHEET_ID = "1GeTLyjV-9NsUt1P5ZCTh8sr4wvUnct5He_M6g7deWF0";
+
+function doGet(e) {
+  return doPost(e);
+}
+
 function doPost(e) {
   try {
     var contents = JSON.parse(e.postData.contents);
     var action = contents.action;
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
     // 1. Retorna o catálogo de Formadores e Atividades
     if (action === 'catalog') {
@@ -131,6 +137,8 @@ function normalizeHeaderKey(key) {
   var k = String(key || '').trim().toLowerCase();
   if (k === 'id' || k === 'código' || k === 'codigo') return 'id';
   if (k === 'nome' || k === 'formador' || k === 'atividade' || k === 'descrição' || k === 'descricao') return 'nome';
+  if (k === 'email' || k === 'e-mail') return 'email';
+  if (k === 'perfil' || k === 'role') return 'perfil';
   return k;
 }
 
