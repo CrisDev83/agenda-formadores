@@ -4,18 +4,20 @@ const API_URL = import.meta.env.VITE_API_URL;
 const DAYS_OF_WEEK = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira'];
 
 const DEFAULT_TEACHERS = [
-  { id: '1', nome: 'Rosiani - CRECHE' },
-  { id: '2', nome: 'Patrícia Leite - PRÉ-ESCOLAR' },
-  { id: '3', nome: 'Vânia - AI - 1º ao 4º' },
-  { id: '4', nome: 'Luciana - AI - 5º e AF - 6º ao 8º' },
-  { id: '5', nome: 'Daiane - EDUCAÇÃO PELO SENSÍVEL' },
-  { id: '6', nome: 'Rosane Palandi - EDUCAÇÃO ESPECIAL' },
-  { id: '7', nome: 'Marizete - EDUCAÇÃO FÍSICA' },
-  { id: '8', nome: 'Gabrielle - ARTE' },
-  { id: '9', nome: 'Cleusa - Ética e Cidadania/ ERER' },
-  { id: '10', nome: 'Sandra Fock - AVALIAÇÕES AI' },
-  { id: '11', nome: 'Evandro - AVALIAÇÕES AF' },
-  { id: '12', nome: 'Adriane - NTE/ Educação Digital' }
+  { id: '1', nome: 'Rosiani - CRECHE', email: 'rosiane.boeing@edu.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '2', nome: 'Patrícia Leite - PRÉ-ESCOLAR', email: 'patricia.leite@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '3', nome: 'Vânia - AI - 1º ao 4º', email: 'vania.cardoso@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '4', nome: 'Luciana - AI - 5º e AF - 6º ao 8º', email: 'luciana.wachholz@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '5', nome: 'Daiane - EDUCAÇÃO PELO SENSÍVEL', email: 'daiane.gava@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '6', nome: 'Rosane Palandi - EDUCAÇÃO ESPECIAL', email: 'rosane.palandi@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '7', nome: 'Marizete - EDUCAÇÃO FÍSICA', email: 'marizete.augusto@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '8', nome: 'Gabrielle - ARTE', email: 'gabrielle.teixeira@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '9', nome: 'Cleusa - Ética e Cidadania/ ERER', email: 'cleusa.araujo@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '10', nome: 'Sandra Fock - AVALIAÇÕES AI', email: 'sandra.fock@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '11', nome: 'Evandro - AVALIAÇÕES AF', email: 'evandro.leithold@prof.garuva.sc.gov.br', perfil: 'Formador' },
+  { id: '12', nome: 'Adriane - NTE/ Educação Digital', email: 'adriane.galando@edu.garuva.sc.gov.br', perfil: 'Admin' },
+  { id: '13', nome: 'Cris Vieira - Dev', email: 'cristhian.vieira@edu.garuva.sc.gov.br', perfil: 'Admin' },
+  { id: '14', nome: 'Cris - Teste', email: 'cristhian.dev83@gmail.com', perfil: 'Formador' }
 ];
 
 const DEFAULT_ACTIVITIES = [
@@ -85,6 +87,13 @@ async function apiCall(body) {
     return json.data;
   } catch (err) {
     clearTimeout(timeoutId);
+    
+    // TRATAMENTO DO ERRO DE ABORTO (Ignora alertas na tela)
+    if (err.name === 'AbortError' || err.message.includes('aborted') || err.message.includes('signal')) {
+      console.warn('Requisição cancelada/abortada:', err.message);
+      return null;
+    }
+    
     throw err;
   }
 }
@@ -106,10 +115,12 @@ function DashboardView() {
     loadDashboardData();
   }, [currentMonday]);
 
-  async function loadDashboardData() {
+async function loadDashboardData() {
     setLoading(true);
     try {
       const catalogData = await apiCall({ action: 'catalog' });
+      if (!catalogData) return;
+
       let teacherList = DEFAULT_TEACHERS;
       let actList = DEFAULT_ACTIVITIES;
 
@@ -137,6 +148,8 @@ function DashboardView() {
       setActivitiesMap(actMap);
 
       const allPlansRes = await apiCall({ action: 'load_all', week: currentMonday });
+      if (!allPlansRes) return;
+
       const plansData = allPlansRes.plans || allPlansRes || {};
       setPlans(plansData);
 
@@ -215,7 +228,11 @@ function DashboardView() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
           {teachers.map((teacher) => {
-            const slots = plans[teacher.id] || plans[teacher.nome] || plans[String(teacher.id)] || Array(10).fill('');
+            const slots = plans[teacher.id] || 
+              plans[String(teacher.id)] || 
+              plans[Number(teacher.id)] || 
+              plans[teacher.nome] || 
+              Array(10).fill('');
             const isFilled = slots.length === 10 && slots.every(s => s && s !== '');
 
             return (
@@ -414,6 +431,8 @@ export default function App() {
     setLoading(true);
     try {
       const data = await apiCall({ action: 'load', teacher: teacherId, week: week });
+      if (!data) return; // Se a requisição foi cancelada, encerra sem dar erro
+
       setSlots(data.slots || Array(10).fill(''));
       setRevision(data.revision || 0);
       setIsLocked(Boolean(data.isLocked));
@@ -464,7 +483,7 @@ export default function App() {
     setIsDirty(true);
   }
 
-  async function handleCopyPreviousWeek() {
+async function handleCopyPreviousWeek() {
     if (!selectedTeacher) {
       alert('Selecione um formador primeiro.');
       return;
@@ -485,6 +504,10 @@ export default function App() {
     setLoading(true);
     try {
       const data = await apiCall({ action: 'load', teacher: selectedTeacher, week: prevMonday });
+      
+      // TRATAMENTO CASO A REQUISIÇÃO SEJA ABORTADA
+      if (!data) return;
+
       if (!data.slots || data.slots.every(s => !s)) {
         alert('A semana anterior está vazia.');
         return;
@@ -656,7 +679,7 @@ export default function App() {
           onClick={handleSave}
           disabled={saving || loading || !selectedTeacher}
         >
-          {saving ? 'Salvando...' : 'Salvar Planejamento'}
+          {saving ? 'Salvando...' : 'Salvar Agenda Semanal'}
         </button>
       )}
     </div>
