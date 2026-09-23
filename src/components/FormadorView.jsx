@@ -3,6 +3,7 @@ import { DEFAULT_TEACHERS, DEFAULT_ACTIVITIES } from '../constants/defaults';
 import { DAYS_OF_WEEK, getMondayOfCurrentWeek, formatDateBR, getFridayFromMonday } from '../utils/dateUtils';
 import { apiCall } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { EMAILS_OCULTOS } from '../constants/hiddenAccounts';
 
 export default function FormadorView() {
   const { user, isAdmin } = useAuth();
@@ -26,6 +27,11 @@ export default function FormadorView() {
   useEffect(() => {
     // Só seleciona se ainda não houver nenhum selecionado e a lista tiver formadores
     if (user && user.nome && teachers.length > 0 && !selectedTeacher) {
+
+      // 🛑 NOVO: Cancela a auto-seleção se o e-mail estiver na lista de e-mails ocultos
+      const emailLogado = String(user?.email || '').trim().toLowerCase();
+      if (EMAILS_OCULTOS.some(o => o.trim().toLowerCase() === emailLogado)) return;
+
       const formadorEncontrado = teachers.find(
         t => t.nome?.trim().toLowerCase() === user.nome?.trim().toLowerCase() ||
              t.id?.trim().toLowerCase() === user.nome?.trim().toLowerCase()
@@ -56,7 +62,8 @@ export default function FormadorView() {
       if (data?.teachers?.length > 0) {
         setTeachers(data.teachers.map(t => ({
           id: String(t.id || t.nome || ''),
-          nome: t.nome || t.id
+          nome: t.nome || t.id,
+          email: t.email || ''
         })));
       }
       if (data?.activities?.length > 0) {
@@ -222,17 +229,23 @@ export default function FormadorView() {
 
       <div className="card">
         <label className="label">Nome do formador *</label>
-        <select
-  className="select-input"
-  value={selectedTeacher}
-  onChange={handleTeacherChange}
-  disabled={loading || saving || !isAdmin}
->
-  <option value="">[Selecione o nome]</option>
-  {teachers.map(t => (
-    <option key={t.id} value={t.id}>{t.nome}</option>
-  ))}
-</select>
+          <select
+              className="select-input"
+              value={selectedTeacher}
+              onChange={handleTeacherChange}
+              disabled={loading || saving || !isAdmin}
+          >
+              <option value="">[Selecione o nome]</option>
+              {teachers
+                .filter(t => {
+                  const emailFormador = String(t.email || '').trim().toLowerCase();
+                  return !EMAILS_OCULTOS.some(o => o.trim().toLowerCase() === emailFormador);
+                })
+                .map(t => (
+                  <option key={t.id} value={t.id}>{t.nome}</option>
+                ))
+              }
+        </select>      
       </div>
 
       <div className="card">

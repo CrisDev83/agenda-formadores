@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
   }
 
   // Auxiliares de permissão
-  const isAdmin = user?.perfil?.toLowerCase() === 'admin';
+  const isAdmin = user?.perfil?.toLowerCase().includes('admin');
   const isFormador = user?.perfil?.toLowerCase() === 'formador';
 
   return (

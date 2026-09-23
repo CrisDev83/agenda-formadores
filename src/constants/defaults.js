@@ -11,7 +11,7 @@ export const DEFAULT_TEACHERS = [
   { id: '10', nome: 'Sandra Fock - AVALIAÇÕES AI', email: 'sandra.fock@prof.garuva.sc.gov.br', perfil: 'Formador' },
   { id: '11', nome: 'Evandro - AVALIAÇÕES AF', email: 'evandro.leithold@prof.garuva.sc.gov.br', perfil: 'Formador' },
   { id: '12', nome: 'Adriane - NTE/ Educação Digital', email: 'adriane.galando@edu.garuva.sc.gov.br', perfil: 'Admin' },
-  { id: '13', nome: 'Cris Vieira - Dev', email: 'cristhian.vieira@edu.garuva.sc.gov.br', perfil: 'Admin' },
+  { id: '13', nome: 'Cris Vieira - Dev', email: 'cristhian.vieira@edu.garuva.sc.gov.br', perfil: 'Admin-Oculto' },
   { id: '14', nome: 'Cris - Teste', email: 'cristhian.dev83@gmail.com', perfil: 'Formador' }
 ];
 
