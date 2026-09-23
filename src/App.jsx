@@ -31,13 +31,13 @@ export default function App() {
           {isAdmin && (
             <nav style={{ display: 'flex', gap: '8px' }}>
               <button 
-                className={`btn ${currentTab === 'formador' ? 'btn-save' : 'btn-secondary'}`}
+                className={`btn ${currentTab === 'formador' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setCurrentTab('formador')}
               >
                 Formulário
               </button>
               <button 
-                className={`btn ${currentTab === 'dashboard' ? 'btn-save' : 'btn-secondary'}`}
+                className={`btn ${currentTab === 'dashboard' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setCurrentTab('dashboard')}
               >
                 Dashboard

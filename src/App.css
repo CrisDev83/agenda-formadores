@@ -231,3 +231,12 @@ body {
   background-color: var(--danger-bg);
   color: var(--danger-text);
 }
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}

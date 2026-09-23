@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { DEFAULT_TEACHERS, DEFAULT_ACTIVITIES } from '../constants/defaults';
 import { DAYS_OF_WEEK, getMondayOfCurrentWeek, formatDateBR, getFridayFromMonday } from '../utils/dateUtils';
 import { apiCall } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function FormadorView() {
+  const { user, isAdmin } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [teachers, setTeachers] = useState(DEFAULT_TEACHERS);
@@ -18,6 +20,23 @@ export default function FormadorView() {
   useEffect(() => {
     fetchCatalog();
   }, []);
+  
+
+  // 2. Seleciona o formador logado automaticamente (Admin ou Formador)
+  useEffect(() => {
+    // Só seleciona se ainda não houver nenhum selecionado e a lista tiver formadores
+    if (user && user.nome && teachers.length > 0 && !selectedTeacher) {
+      const formadorEncontrado = teachers.find(
+        t => t.nome?.trim().toLowerCase() === user.nome?.trim().toLowerCase() ||
+             t.id?.trim().toLowerCase() === user.nome?.trim().toLowerCase()
+      );
+
+      if (formadorEncontrado) {
+        setSelectedTeacher(formadorEncontrado.id);
+      }
+    }
+  }, [user, teachers, selectedTeacher]);
+
 
   useEffect(() => {
     if (selectedTeacher) {
@@ -204,16 +223,16 @@ export default function FormadorView() {
       <div className="card">
         <label className="label">Nome do formador *</label>
         <select
-          className="select-input"
-          value={selectedTeacher}
-          onChange={handleTeacherChange}
-          disabled={loading || saving}
-        >
-          <option value="">[Selecione o nome]</option>
-          {teachers.map(t => (
-            <option key={t.id} value={t.id}>{t.nome}</option>
-          ))}
-        </select>
+  className="select-input"
+  value={selectedTeacher}
+  onChange={handleTeacherChange}
+  disabled={loading || saving || !isAdmin}
+>
+  <option value="">[Selecione o nome]</option>
+  {teachers.map(t => (
+    <option key={t.id} value={t.id}>{t.nome}</option>
+  ))}
+</select>
       </div>
 
       <div className="card">
