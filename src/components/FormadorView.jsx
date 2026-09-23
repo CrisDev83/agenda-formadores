@@ -146,7 +146,7 @@ export default function FormadorView() {
       return;
     }
     if (isLocked) {
-      alert('Este planejamento já foi enviado e não pode ser alterado. Fale com a administração!');
+      alert('Este planejamento já foi enviado e não pode ser alterado.');
       return;
     }
 
@@ -337,7 +337,7 @@ export default function FormadorView() {
           marginTop: '20px',
           fontSize: '0.95rem'
         }}>
-          🔒 Este planejamento já foi enviado e está bloqueado para alterações.
+          🔒 Este planejamento já foi enviado e está bloqueado para alterações. 
         </div>
       ) : (
         <button
