@@ -28,6 +28,8 @@ export function AuthProvider({ children }) {
         throw new Error('E-mail não autorizado no sistema.');
       }
     } catch (err) {
+      localStorage.clear();
+      sessionStorage.clear();
       const msg = err.message || 'Erro ao autenticar com o Google.';
       setError(msg);
       return { success: false, error: msg };
