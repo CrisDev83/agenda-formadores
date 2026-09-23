@@ -215,10 +215,16 @@ export default function DashboardView() {
                     return (
                       <div key={dayName} style={{ borderBottom: '1px dashed #f1f5f9', paddingBottom: '4px' }}>
                         <div style={{ fontWeight: '600', color: '#475569' }}>{dayName}</div>
-                        <div style={{ paddingLeft: '8px', color: '#334155' }}>
-                          • Manhã: <strong style={{ color: matAct !== '-' ? '#2563eb' : '#dc2626' }}>{matAct}</strong><br/>
-                          • Tarde: <strong style={{ color: vesAct !== '-' ? '#2563eb' : '#dc2626' }}>{vesAct}</strong>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', color: '#334155' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span>• Manhã:</span>
+                          <strong style={{ color: matAct !== '-' ? '#2563eb' : '#dc2626', textAlign: 'right' }}>{matAct}</strong>
                         </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span>• Tarde:</span>
+                          <strong style={{ color: vesAct !== '-' ? '#2563eb' : '#dc2626', textAlign: 'right' }}>{vesAct}</strong>
+                        </div>
+                      </div>
                       </div>
                     );
                   })}

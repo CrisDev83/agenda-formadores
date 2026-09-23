@@ -28,7 +28,7 @@ export default function FormadorView() {
     // Só seleciona se ainda não houver nenhum selecionado e a lista tiver formadores
     if (user && user.nome && teachers.length > 0 && !selectedTeacher) {
 
-      // 🛑 NOVO: Cancela a auto-seleção se o e-mail estiver na lista de e-mails ocultos
+      // Cancela a auto-seleção se o e-mail estiver na lista de e-mails ocultos
       const emailLogado = String(user?.email || '').trim().toLowerCase();
       if (EMAILS_OCULTOS.some(o => o.trim().toLowerCase() === emailLogado)) return;
 
