@@ -6,5 +6,5 @@
  */
 export const EMAILS_OCULTOS = [
   'cristhian.vieira@edu.garuva.sc.gov.br',
-  // 'novo.email@edu.garuva.sc.gov.br',
+  'arthur.neto@edu.garuva.sc.gov.br'
 ];

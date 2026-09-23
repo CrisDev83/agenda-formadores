@@ -10,6 +10,28 @@ function doPost(e) {
     var action = contents.action;
     var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
+    
+// 0. Autenticação por E-mail
+    if (action === 'login') {
+      var emailInput = String(contents.email || '').trim().toLowerCase();
+      if (!emailInput) {
+        throw new Error('Por favor, informe o e-mail.');
+      }
+
+      var formadores = getNormalizedSheetData(ss.getSheetByName('Formadores'));
+      var user = formadores.find(function(f) {
+        var fEmail = String(f.email || f['e-mail'] || '').trim().toLowerCase();
+        return fEmail === emailInput;
+      });
+
+      if (!user) {
+        throw new Error('E-mail não autorizado no sistema: ' + emailInput);
+      }
+
+      return responseJSON({ user: user });
+    }
+
+
     // 1. Retorna o catálogo de Formadores e Atividades
     if (action === 'catalog') {
       return responseJSON({
@@ -195,14 +217,29 @@ function cleanVal(val) {
 function findPlanningRow(sheet, teacher, week) {
   if (!sheet) return null;
   var values = sheet.getDataRange().getValues();
-  var targetTeacher = cleanVal(teacher);
+  var targetTeacher = cleanVal(teacher).toLowerCase();
   var targetWeek = normalizeDateStr(week);
 
+  var ss = sheet.getParent();
+  var formadores = getNormalizedSheetData(ss.getSheetByName('Formadores'));
+  var matchedTeacher = formadores.find(function(f) {
+    return cleanVal(f.id).toLowerCase() === targetTeacher ||
+           cleanVal(f.nome).toLowerCase() === targetTeacher ||
+           cleanVal(f.email).toLowerCase() === targetTeacher;
+  });
+
+  var possibleIdentifiers = [targetTeacher];
+  if (matchedTeacher) {
+    if (matchedTeacher.id) possibleIdentifiers.push(cleanVal(matchedTeacher.id).toLowerCase());
+    if (matchedTeacher.nome) possibleIdentifiers.push(cleanVal(matchedTeacher.nome).toLowerCase());
+    if (matchedTeacher.email) possibleIdentifiers.push(cleanVal(matchedTeacher.email).toLowerCase());
+  }
+
   for (var i = 1; i < values.length; i++) {
-    var rowTeacher = cleanVal(values[i][1]);
+    var rowTeacher = cleanVal(values[i][1]).toLowerCase();
     var rowWeek = normalizeDateStr(values[i][2]);
 
-    if ((rowTeacher === targetTeacher || rowTeacher.toLowerCase() === targetTeacher.toLowerCase()) && rowWeek === targetWeek) {
+    if (possibleIdentifiers.indexOf(rowTeacher) !== -1 && rowWeek === targetWeek) {
       return i + 1;
     }
   }
@@ -230,3 +267,5 @@ function loadAllPlanningsForWeek(sheet, week) {
   }
   return plans;
 }
+
+

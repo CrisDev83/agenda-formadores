@@ -3,6 +3,7 @@ import { DEFAULT_TEACHERS, DEFAULT_ACTIVITIES } from '../constants/defaults';
 import { DAYS_OF_WEEK, getMondayOfCurrentWeek, formatDateBR, getFridayFromMonday } from '../utils/dateUtils';
 import { apiCall } from '../services/api';
 import EditModal from './EditModal';
+import { EMAILS_OCULTOS } from '../constants/hiddenAccounts'; // <--- ADICIONAR ESTA LINHA
 
 export default function DashboardView() {
   const [loading, setLoading] = useState(true);
@@ -27,7 +28,8 @@ export default function DashboardView() {
       if (catalogData?.teachers && catalogData.teachers.length > 0) {
         teacherList = catalogData.teachers.map(t => ({
           id: String(t.id || t.nome || ''),
-          nome: t.nome || t.id
+          nome: t.nome || t.id,
+          email: t.email || '' // <--- INCLUIR A PROPRIEDADE EMAIL
         }));
         setTeachers(teacherList);
       }
@@ -135,6 +137,10 @@ export default function DashboardView() {
   }
 
   const fridayIso = getFridayFromMonday(currentMonday);
+  const visibleTeachers = teachers.filter(t => {
+    const emailFormador = String(t.email || '').trim().toLowerCase();
+    return !EMAILS_OCULTOS.some(o => o.trim().toLowerCase() === emailFormador);
+  });
 
   return (
     <div className="container" style={{ maxWidth: '1200px' }}>
@@ -159,7 +165,7 @@ export default function DashboardView() {
         <div className="loading-box">Carregando planejamentos da equipe...</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
-          {teachers.map((teacher) => {
+          {visibleTeachers.map((teacher) => {
             let rawSlots = plans[teacher.id] || 
                            plans[String(teacher.id)] || 
                            plans[Number(teacher.id)] || 
