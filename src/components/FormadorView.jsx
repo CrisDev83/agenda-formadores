@@ -146,7 +146,7 @@ export default function FormadorView() {
       return;
     }
     if (isLocked) {
-      alert('Este planejamento já foi enviado e não pode ser alterado.');
+      alert('Este planejamento já foi enviado e não pode ser alterado. Fale com a administração!');
       return;
     }
 
