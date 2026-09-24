@@ -12,7 +12,8 @@ export const DEFAULT_TEACHERS = [
   { id: '11', nome: 'Evandro - AVALIAÇÕES AF', email: 'evandro.leithold@prof.garuva.sc.gov.br', perfil: 'Formador' },
   { id: '12', nome: 'Adriane - NTE/ Educação Digital', email: 'adriane.galando@edu.garuva.sc.gov.br', perfil: 'Admin' },
   { id: '13', nome: 'Cris Vieira - Dev', email: 'cristhian.vieira@edu.garuva.sc.gov.br', perfil: 'Admin' },
-  { id: '14', nome: 'Arthur - Teste/Teste', email: 'arthur.neto@edu.garuva.sc.gov.br', perfil: 'Admin' }
+  { id: '14', nome: 'Arthur - SME', email: 'arthur.neto@edu.garuva.sc.gov.br', perfil: 'Admin' },
+  { id: '15', nome: 'Fabio - SME', email: 'fabio.oliveira@edu.garuva.sc.gov.br', perfil: 'Admin' },
 ];
 
 export const DEFAULT_ACTIVITIES = [
