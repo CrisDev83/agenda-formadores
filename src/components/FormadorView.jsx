@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DEFAULT_TEACHERS, DEFAULT_ACTIVITIES } from '../constants/defaults';
 import { DAYS_OF_WEEK, getMondayOfCurrentWeek, formatDateBR, getFridayFromMonday } from '../utils/dateUtils';
 import { apiCall } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { EMAILS_OCULTOS } from '../constants/hiddenAccounts';
-import React, { useState, useEffect, useRef } from 'react';
+
 
 
 export default function FormadorView() {
