@@ -11,11 +11,10 @@ export async function apiCall(body) {
     : `${API_URL}?_t=${Date.now()}`;
 
   const controller = new AbortController();
-  // 2. Aumentar o tempo de limite de 15000 para 35000 (35 segundos)
+  // 2. Limite de tempo de 35 segundos
   const timeoutId = setTimeout(() => controller.abort(), 35000);
 
   try {
-    // 3. Substituir API_URL por urlWithCacheBuster e adicionar cache: 'no-store'
     const response = await fetch(urlWithCacheBuster, {
       method: 'POST',
       cache: 'no-store',
@@ -25,15 +24,33 @@ export async function apiCall(body) {
     });
     clearTimeout(timeoutId);
 
-    const json = await response.json();
+    // 3. Validação de status HTTP do servidor (evita 404/500 do Google)
+    if (!response.ok) {
+      console.warn(`O servidor do Google retornou status HTTP ${response.status}`);
+      return null;
+    }
+
+    // 4. Ler o corpo da resposta como texto bruto primeiro
+    const text = await response.text();
+
+    // 5. Verificar se o Google retornou HTML de erro (ex: <!DOCTYPE html> ou <html>)
+    if (text.trim().startsWith('<')) {
+      console.warn('O Google Apps Script retornou uma página HTML em vez de JSON.');
+      return null; // Retorna null para o sistema usar dados locais/fallback em vez de quebrar a tela
+    }
+
+    // 6. Converter para JSON com segurança
+    const json = JSON.parse(text);
+    
     if (!json.ok) {
       throw new Error(json.error || 'Erro no servidor.');
     }
     return json.data;
+
   } catch (err) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError' || err.message.includes('aborted') || err.message.includes('signal')) {
-      console.warn('Requisição cancelada/abortada:', err.message);
+      console.warn('Requisição cancelada/abortada por timeout:', err.message);
       return null;
     }
     throw err;
