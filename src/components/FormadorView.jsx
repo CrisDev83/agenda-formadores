@@ -4,6 +4,8 @@ import { DAYS_OF_WEEK, getMondayOfCurrentWeek, formatDateBR, getFridayFromMonday
 import { apiCall } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { EMAILS_OCULTOS } from '../constants/hiddenAccounts';
+import React, { useState, useEffect, useRef } from 'react';
+
 
 export default function FormadorView() {
   const { user, isAdmin } = useAuth();
@@ -17,6 +19,7 @@ export default function FormadorView() {
   const [revision, setRevision] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const activeLoadRef = useRef(null);
 
   useEffect(() => {
     fetchCatalog();
@@ -80,26 +83,41 @@ export default function FormadorView() {
   }
 
   async function loadPlanning(teacherId, week) {
-    setLoading(true);
-    try {
-      const data = await apiCall({ action: 'load', teacher: teacherId, week: week });
-      if (!data) return;
+  // Identificador único para a combinação do formador + semana
+  const currentRequestKey = `${teacherId}_${week}`;
 
-      let rawSlots = data.slots;
-      if (typeof rawSlots === 'string') {
-        try { rawSlots = JSON.parse(rawSlots); } catch (e) { rawSlots = Array(10).fill(''); }
-      }
+  // SE JÁ HOUVER UMA REQUISIÇÃO IGUAL EM ANDAMENTO, CANCELA A SEGUNDA!
+  if (activeLoadRef.current === currentRequestKey) return;
 
-      setSlots(Array.isArray(rawSlots) ? rawSlots : Array(10).fill(''));
-      setRevision(data.revision || 0);
-      setIsLocked(Boolean(data.isLocked));
-      setIsDirty(false);
-    } catch (err) {
-      alert(`Erro ao carregar: ${err.message}`);
-    } finally {
+  activeLoadRef.current = currentRequestKey;
+  setLoading(true);
+
+  try {
+    const data = await apiCall({ action: 'load', teacher: teacherId, week: week });
+
+    // Se o usuário trocou de formador antes da resposta chegar, ignora
+    if (activeLoadRef.current !== currentRequestKey) return;
+
+    if (!data) return;
+
+    let rawSlots = data.slots;
+    if (typeof rawSlots === 'string') {
+      try { rawSlots = JSON.parse(rawSlots); } catch (e) { rawSlots = Array(10).fill(''); }
+    }
+
+    setSlots(Array.isArray(rawSlots) ? rawSlots : Array(10).fill(''));
+    setRevision(data.revision || 0);
+    setIsLocked(Boolean(data.isLocked));
+    setIsDirty(false);
+  } catch (err) {
+    console.error(`Erro ao carregar planejamento: ${err.message}`);
+  } finally {
+    if (activeLoadRef.current === currentRequestKey) {
       setLoading(false);
+      activeLoadRef.current = null;
     }
   }
+}
 
   function handleTeacherChange(e) {
     const newTeacher = e.target.value;
