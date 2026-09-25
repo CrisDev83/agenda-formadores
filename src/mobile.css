@@ -1,0 +1,104 @@
+/* src/mobile.css - Estilos Gerais e Ajustes Mobile */
+
+/* Estilos Padrão do Header */
+.app-header {
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info span {
+  font-size: 0.95rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 8px;
+}
+
+/* ==========================================
+   REGRAS ESPECÍFICAS PARA TELA MOBILE (< 640px)
+   ========================================== */
+@media (max-width: 640px) {
+  /* 1. Reorganização do Cabeçalho */
+  .app-header {
+    flex-direction: column;
+    padding: 12px 16px;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .user-info {
+    text-align: center;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .header-nav {
+    flex: 1;
+    display: flex;
+    gap: 6px;
+  }
+
+  .header-nav .btn {
+    flex: 1;
+    padding: 8px 4px;
+    font-size: 0.82rem;
+    text-align: center;
+  }
+
+  .btn-logout {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+  }
+
+  /* 2. Reorganização do Seletor de Semana (FormadorView) */
+  .week-selector {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .week-text {
+    order: 1 !important;
+    width: 100% !important;
+    text-align: center !important;
+    font-weight: bold !important;
+    font-size: 1rem !important;
+    display: block !important;
+    margin-bottom: 4px !important;
+  }
+
+  .week-selector button {
+    order: 2 !important;
+    flex: 1 !important;
+    max-width: 48% !important;
+  }
+
+  /* 3. Reorganização do Contador de Períodos e Copiar Semana */
+  .counter-wrapper {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    text-align: center !important;
+    gap: 12px !important;
+  }
+
+  .counter-wrapper button {
+    width: 100% !important;
+  }
+}
