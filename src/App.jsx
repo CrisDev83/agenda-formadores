@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { useAuth } from './context/AuthContext';
 import LoginView from './components/LoginView';
 import FormadorView from './components/FormadorView';
@@ -16,20 +16,14 @@ export default function App() {
   // 2. Se estiver logado, exibe o cabeçalho e as telas conforme o perfil
   return (
     <div>
-      <header style={{
-        backgroundColor: '#1e293b',
-        color: '#ffffff',
-        padding: '12px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <header className="app-header">
+        <div className="user-info">
           <span><strong>{user?.nome}</strong> ({isAdmin ? 'Admin' : 'Formador'})</span>
+        </div>
 
-          {/* Botões visíveis apenas para Administrador */}
+        <div className="header-actions">
           {isAdmin && (
-            <nav style={{ display: 'flex', gap: '8px' }}>
+            <nav className="header-nav">
               <button 
                 className={`btn ${currentTab === 'formador' ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => setCurrentTab('formador')}
@@ -44,11 +38,11 @@ export default function App() {
               </button>
             </nav>
           )}
-        </div>
 
-        <button className="btn btn-secondary" onClick={logout}>
-          Sair
-        </button>
+          <button className="btn btn-secondary btn-logout" onClick={logout}>
+            Sair
+          </button>
+        </div>
       </header>
 
       <main>
