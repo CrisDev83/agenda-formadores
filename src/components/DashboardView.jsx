@@ -5,6 +5,9 @@ import { apiCall } from '../services/api';
 import EditModal from './EditModal';
 import { EMAILS_OCULTOS } from '../constants/hiddenAccounts'; // <--- ADICIONAR ESTA LINHA
 
+let cachedCatalog = null;
+
+
 export default function DashboardView() {
   const [loading, setLoading] = useState(true);
   const [teachers, setTeachers] = useState(DEFAULT_TEACHERS);
@@ -17,11 +20,22 @@ export default function DashboardView() {
   const [editSlots, setEditSlots] = useState(Array(10).fill(''));
   const [savingAdmin, setSavingAdmin] = useState(false);
 
-  const loadDashboardData = useCallback(async () => {
+ const loadDashboardData = useCallback(async () => {
     setLoading(true);
     try {
-      const catalogData = await apiCall({ action: 'catalog' });
-      
+      // 1. Busca catálogo (com cache) e planejamentos em PARALELO para reduzir o tempo pela metade
+      const catalogPromise = cachedCatalog 
+        ? Promise.resolve(cachedCatalog) 
+        : apiCall({ action: 'catalog' });
+
+      const plansPromise = apiCall({ action: 'load_all', week: currentMonday });
+
+      const [catalogData, allPlansRes] = await Promise.all([catalogPromise, plansPromise]);
+
+      if (catalogData && !cachedCatalog) {
+        cachedCatalog = catalogData;
+      }
+
       let teacherList = DEFAULT_TEACHERS;
       let actList = DEFAULT_ACTIVITIES;
 
@@ -29,7 +43,7 @@ export default function DashboardView() {
         teacherList = catalogData.teachers.map(t => ({
           id: String(t.id || t.nome || ''),
           nome: t.nome || t.id,
-          email: t.email || '' // <--- INCLUIR A PROPRIEDADE EMAIL
+          email: t.email || ''
         }));
         setTeachers(teacherList);
       }
@@ -49,7 +63,6 @@ export default function DashboardView() {
       });
       setActivitiesMap(actMap);
 
-      const allPlansRes = await apiCall({ action: 'load_all', week: currentMonday });
       if (!allPlansRes) return;
 
       const rawPlans = allPlansRes.plans || allPlansRes || {};
@@ -83,7 +96,7 @@ export default function DashboardView() {
     } finally {
       setLoading(false);
     }
-  }, [currentMonday]);
+  }, [currentMonday]); 
 
   useEffect(() => {
     loadDashboardData();
