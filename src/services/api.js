@@ -2,12 +2,23 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export async function apiCall(paramsObj = {}) {
   if (!API_URL || API_URL.includes('SUA_URL_DA_WEB_APP_AQUI')) {
-    throw new Error('URL da API não configurada.');
+    throw new Error('URL da API não configurada. Verifique as variáveis de ambiente (.env).');
   }
 
-  // 1. Converte os dados em Query Parameters (GET) para evitar bloqueios de Proxy
+  // Serializa parâmetros complexos (Arrays ou Objetos) para JSON strings
+  const formattedParams = {};
+  Object.keys(paramsObj).forEach(key => {
+    const val = paramsObj[key];
+    if (typeof val === 'object' && val !== null) {
+      formattedParams[key] = JSON.stringify(val);
+    } else if (val !== undefined && val !== null) {
+      formattedParams[key] = val;
+    }
+  });
+
+  // 1. Converte os dados em Query Parameters (GET) para evitar bloqueios de CORS/Proxy
   const queryParams = new URLSearchParams({
-    ...paramsObj,
+    ...formattedParams,
     _t: Date.now() // Anti-cache
   }).toString();
 
@@ -16,7 +27,7 @@ export async function apiCall(paramsObj = {}) {
     : `${API_URL}?${queryParams}`;
 
   const controller = new AbortController();
-  // 2. Aumentado o timeout de 15s para 50s (garante tempo suficiente para o Google Apps Script)
+  // Timeout de 50s para suportar respostas lentas do Apps Script
   const timeoutId = setTimeout(() => controller.abort(), 50000);
 
   try {
@@ -33,11 +44,11 @@ export async function apiCall(paramsObj = {}) {
       throw new Error(`Servidor respondeu com status HTTP ${response.status}`);
     }
 
-    // 3. Lê primeiro como texto para evitar crash de parse do JSON caso venha erro HTML
+    // 2. Lê primeiro como texto para evitar crash de parse do JSON caso venha HTML de erro do Google
     const text = await response.text();
 
     if (text.trim().startsWith('<')) {
-      throw new Error('O Google Apps Script retornou uma página HTML em vez de JSON. Verifique as permissões de acesso da implantação ("Qualquer pessoa").');
+      throw new Error('O Google Apps Script retornou HTML em vez de JSON. Verifique se a implantação do Web App está configurada para "Qualquer pessoa" (Anyone).');
     }
 
     const json = JSON.parse(text);
@@ -53,7 +64,7 @@ export async function apiCall(paramsObj = {}) {
 
     if (err.name === 'AbortError' || err.message.includes('aborted') || err.message.includes('signal')) {
       console.warn('Requisição cancelada/abortada por tempo limite:', err.message);
-      throw new Error('A requisição demorou muito e foi cancelada. Tente novamente.');
+      throw new Error('A requisição demorou muito para responder e foi cancelada. Tente novamente.');
     }
 
     throw err;

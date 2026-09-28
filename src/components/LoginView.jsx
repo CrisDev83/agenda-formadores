@@ -3,8 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
 
 export default function LoginView() {
- 
- const { login, loading, error } = useAuth();
+  const { login, loading, error } = useAuth();
 
   return (
     <div className="container" style={{ maxWidth: '420px', marginTop: '60px' }}>
@@ -28,12 +27,19 @@ export default function LoginView() {
         )}
 
         {loading ? (
-          <p>Autenticando...</p>
+          <div className="loading-box" style={{ width: '100%', margin: 0 }}>
+            Autenticando, aguarde...
+          </div>
         ) : (
-          <GoogleLogin
-            onSuccess={(credentialResponse) => login(credentialResponse)}
-            onError={() => alert('Falha ao autenticar com o Google')}
-          />
+          <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <GoogleLogin
+              onSuccess={(credentialResponse) => login(credentialResponse)}
+              onError={() => alert('Falha ao autenticar com o Google. Tente novamente.')}
+              useOneTap={false}
+              theme="outline"
+              shape="rectangular"
+            />
+          </div>
         )}
       </div>
     </div>

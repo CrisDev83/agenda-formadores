@@ -1,18 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DEFAULT_TEACHERS, DEFAULT_ACTIVITIES } from '../constants/defaults';
 import { DAYS_OF_WEEK, getMondayOfCurrentWeek, formatDateBR, getFridayFromMonday } from '../utils/dateUtils';
 import { apiCall } from '../services/api';
 import EditModal from './EditModal';
-import { EMAILS_OCULTOS } from '../constants/hiddenAccounts'; // <--- ADICIONAR ESTA LINHA
-
-let cachedCatalog = null;
-
+import { EMAILS_OCULTOS } from '../constants/hiddenAccounts';
 
 export default function DashboardView() {
   const [loading, setLoading] = useState(true);
-  const [teachers, setTeachers] = useState(DEFAULT_TEACHERS);
-  const [activities, setActivities] = useState(DEFAULT_ACTIVITIES);
-  const [activitiesMap, setActivitiesMap] = useState({});
   const [currentMonday, setCurrentMonday] = useState(getMondayOfCurrentWeek());
   const [plans, setPlans] = useState({});
 
@@ -20,48 +14,25 @@ export default function DashboardView() {
   const [editSlots, setEditSlots] = useState(Array(10).fill(''));
   const [savingAdmin, setSavingAdmin] = useState(false);
 
- const loadDashboardData = useCallback(async () => {
+  // Catálogos estáticos vindos diretamente do defaults.js
+  const teachers = DEFAULT_TEACHERS;
+  const activities = DEFAULT_ACTIVITIES;
+
+  // Mapeia os IDs das atividades para seus nomes para rápido acesso visual
+  const activitiesMap = useMemo(() => {
+    const actMap = {};
+    activities.forEach(a => {
+      actMap[a.id] = a.nome;
+      actMap[a.nome] = a.nome;
+    });
+    return actMap;
+  }, [activities]);
+
+  // Carrega apenas os planejamentos cadastrados para a semana informada
+  const loadDashboardData = useCallback(async () => {
     setLoading(true);
     try {
-      // 1. Busca catálogo (com cache) e planejamentos em PARALELO para reduzir o tempo pela metade
-      const catalogPromise = cachedCatalog 
-        ? Promise.resolve(cachedCatalog) 
-        : apiCall({ action: 'catalog' });
-
-      const plansPromise = apiCall({ action: 'load_all', week: currentMonday });
-
-      const [catalogData, allPlansRes] = await Promise.all([catalogPromise, plansPromise]);
-
-      if (catalogData && !cachedCatalog) {
-        cachedCatalog = catalogData;
-      }
-
-      let teacherList = DEFAULT_TEACHERS;
-      let actList = DEFAULT_ACTIVITIES;
-
-      if (catalogData?.teachers && catalogData.teachers.length > 0) {
-        teacherList = catalogData.teachers.map(t => ({
-          id: String(t.id || t.nome || ''),
-          nome: t.nome || t.id,
-          email: t.email || ''
-        }));
-        setTeachers(teacherList);
-      }
-
-      if (catalogData?.activities && catalogData.activities.length > 0) {
-        actList = catalogData.activities.map(a => ({
-          id: String(a.id || a.nome || ''),
-          nome: a.nome || a.id
-        }));
-        setActivities(actList);
-      }
-
-      const actMap = {};
-      actList.forEach(a => {
-        actMap[a.id] = a.nome;
-        actMap[a.nome] = a.nome;
-      });
-      setActivitiesMap(actMap);
+      const allPlansRes = await apiCall({ action: 'load_all', week: currentMonday });
 
       if (!allPlansRes) return;
 
@@ -235,15 +206,15 @@ export default function DashboardView() {
                       <div key={dayName} style={{ borderBottom: '1px dashed #f1f5f9', paddingBottom: '4px' }}>
                         <div style={{ fontWeight: '600', color: '#475569' }}>{dayName}</div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', color: '#334155' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span>• Manhã:</span>
-                          <strong style={{ color: matAct !== '-' ? '#2563eb' : '#dc2626', textAlign: 'right' }}>{matAct}</strong>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>• Manhã:</span>
+                            <strong style={{ color: matAct !== '-' ? '#2563eb' : '#dc2626', textAlign: 'right' }}>{matAct}</strong>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>• Tarde:</span>
+                            <strong style={{ color: vesAct !== '-' ? '#2563eb' : '#dc2626', textAlign: 'right' }}>{vesAct}</strong>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span>• Tarde:</span>
-                          <strong style={{ color: vesAct !== '-' ? '#2563eb' : '#dc2626', textAlign: 'right' }}>{vesAct}</strong>
-                        </div>
-                      </div>
                       </div>
                     );
                   })}

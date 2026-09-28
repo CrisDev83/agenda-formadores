@@ -1,31 +1,52 @@
-import React, { createContext, useContext, useState } from 'react';
-import { apiCall } from '../services/api';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { DEFAULT_TEACHERS } from '../constants/defaults';
 
 const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  // 1. Inicializa o estado recuperando do localStorage para manter a sessão ativa
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('@Agenda:user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Função centralizada para realizar o login
-  // Função centralizada para realizar o login via Google OAuth
+  // Sincroniza o usuário no localStorage
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('@Agenda:user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('@Agenda:user');
+    }
+  }, [user]);
+
+  // Função de login instantânea validando o e-mail contra o DEFAULT_TEACHERS
   async function login(credentialResponse) {
     setLoading(true);
     setError('');
     try {
-      // Extrai e decodifica o e-mail verificado do token do Google
+      // Extrai e decodifica o e-mail retornado pelo Google
       const decoded = jwtDecode(credentialResponse.credential);
       const cleanEmail = String(decoded.email || '').trim().toLowerCase();
 
-      const data = await apiCall({ action: 'login', email: cleanEmail });
+      // Procura o usuário na lista local de formadores
+      const foundUser = DEFAULT_TEACHERS.find((teacher) => {
+        const teacherEmail = String(teacher.email || '').trim().toLowerCase();
+        return teacherEmail === cleanEmail;
+      });
 
-      if (data?.user) {
-        setUser(data.user);
-        return { success: true, user: data.user };
+      if (foundUser) {
+        setUser(foundUser);
+        return { success: true, user: foundUser };
       } else {
-        throw new Error('E-mail não autorizado no sistema.');
+        throw new Error(`E-mail não autorizado no sistema: ${cleanEmail}`);
       }
     } catch (err) {
       const msg = err.message || 'Erro ao autenticar com o Google.';
@@ -36,13 +57,14 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // Função centralizada para encerramento de sessão
+  // Encerramento de sessão limpo
   function logout() {
     setUser(null);
     setError('');
+    localStorage.removeItem('@Agenda:user');
+    localStorage.removeItem('@Agenda:catalog');
   }
 
-  // Auxiliares de permissão
   const isAdmin = user?.perfil?.toLowerCase().includes('admin');
   const isFormador = user?.perfil?.toLowerCase() === 'formador';
 
@@ -64,7 +86,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Custom Hook para consumir o contexto em qualquer componente
 export function useAuth() {
   return useContext(AuthContext);
 }

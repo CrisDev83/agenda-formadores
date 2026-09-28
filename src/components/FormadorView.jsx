@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DEFAULT_TEACHERS, DEFAULT_ACTIVITIES } from '../constants/defaults';
 import { DAYS_OF_WEEK, getMondayOfCurrentWeek, formatDateBR, getFridayFromMonday } from '../utils/dateUtils';
 import { apiCall } from '../services/api';
@@ -9,8 +9,11 @@ export default function FormadorView() {
   const { user, isAdmin } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [teachers, setTeachers] = useState(DEFAULT_TEACHERS);
-  const [activities, setActivities] = useState(DEFAULT_ACTIVITIES);
+  
+  // Catálogos carregados diretamente do defaults.js (0ms de atraso)
+  const teachers = DEFAULT_TEACHERS;
+  const activities = DEFAULT_ACTIVITIES;
+
   const [selectedTeacher, setSelectedTeacher] = useState('');
   const [currentMonday, setCurrentMonday] = useState(getMondayOfCurrentWeek());
   const [slots, setSlots] = useState(Array(10).fill(''));
@@ -18,23 +21,16 @@ export default function FormadorView() {
   const [isLocked, setIsLocked] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
+  // 1. Auto-seleciona o formador logado
   useEffect(() => {
-    fetchCatalog();
-  }, []);
-  
-
-  // 2. Seleciona o formador logado automaticamente (Admin ou Formador)
-  useEffect(() => {
-    // Só seleciona se ainda não houver nenhum selecionado e a lista tiver formadores
     if (user && user.nome && teachers.length > 0 && !selectedTeacher) {
-
-      // Cancela a auto-seleção se o e-mail estiver na lista de e-mails ocultos
       const emailLogado = String(user?.email || '').trim().toLowerCase();
       if (EMAILS_OCULTOS.some(o => o.trim().toLowerCase() === emailLogado)) return;
 
       const formadorEncontrado = teachers.find(
         t => t.nome?.trim().toLowerCase() === user.nome?.trim().toLowerCase() ||
-             t.id?.trim().toLowerCase() === user.nome?.trim().toLowerCase()
+             t.id?.trim().toLowerCase() === String(user.id || '').trim().toLowerCase() ||
+             t.email?.trim().toLowerCase() === emailLogado
       );
 
       if (formadorEncontrado) {
@@ -43,43 +39,8 @@ export default function FormadorView() {
     }
   }, [user, teachers, selectedTeacher]);
 
-
-  useEffect(() => {
-    if (selectedTeacher) {
-      loadPlanning(selectedTeacher, currentMonday);
-    } else {
-      setSlots(Array(10).fill(''));
-      setRevision(0);
-      setIsLocked(false);
-      setIsDirty(false);
-    }
-  }, [selectedTeacher, currentMonday]);
-
-  async function fetchCatalog() {
-    setLoading(true);
-    try {
-      const data = await apiCall({ action: 'catalog' });
-      if (data?.teachers?.length > 0) {
-        setTeachers(data.teachers.map(t => ({
-          id: String(t.id || t.nome || ''),
-          nome: t.nome || t.id,
-          email: t.email || ''
-        })));
-      }
-      if (data?.activities?.length > 0) {
-        setActivities(data.activities.map(a => ({
-          id: String(a.id || a.nome || ''),
-          nome: a.nome || a.id
-        })));
-      }
-    } catch (err) {
-      console.warn('Usando catálogo padrão:', err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function loadPlanning(teacherId, week) {
+  // 2. Carrega os planejamentos da semana
+  const loadPlanning = useCallback(async (teacherId, week) => {
     setLoading(true);
     try {
       const data = await apiCall({ action: 'load', teacher: teacherId, week: week });
@@ -95,11 +56,23 @@ export default function FormadorView() {
       setIsLocked(Boolean(data.isLocked));
       setIsDirty(false);
     } catch (err) {
-      alert(`Erro ao carregar: ${err.message}`);
+      alert(`Erro ao carregar planejamento: ${err.message}`);
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (selectedTeacher) {
+      loadPlanning(selectedTeacher, currentMonday);
+    } else {
+      setSlots(Array(10).fill(''));
+      setRevision(0);
+      setIsLocked(false);
+      setIsDirty(false);
+      setLoading(false);
+    }
+  }, [selectedTeacher, currentMonday, loadPlanning]);
 
   function handleTeacherChange(e) {
     const newTeacher = e.target.value;
@@ -229,22 +202,22 @@ export default function FormadorView() {
 
       <div className="card">
         <label className="label">Nome do formador *</label>
-          <select
-              className="select-input"
-              value={selectedTeacher}
-              onChange={handleTeacherChange}
-              disabled={loading || saving || !isAdmin}
-          >
-              <option value="">[Selecione o nome]</option>
-              {teachers
-                .filter(t => {
-                  const emailFormador = String(t.email || '').trim().toLowerCase();
-                  return !EMAILS_OCULTOS.some(o => o.trim().toLowerCase() === emailFormador);
-                })
-                .map(t => (
-                  <option key={t.id} value={t.id}>{t.nome}</option>
-                ))
-              }
+        <select
+          className="select-input"
+          value={selectedTeacher}
+          onChange={handleTeacherChange}
+          disabled={loading || saving || !isAdmin}
+        >
+          <option value="">[Selecione o nome]</option>
+          {teachers
+            .filter(t => {
+              const emailFormador = String(t.email || '').trim().toLowerCase();
+              return !EMAILS_OCULTOS.some(o => o.trim().toLowerCase() === emailFormador);
+            })
+            .map(t => (
+              <option key={t.id} value={t.id}>{t.nome}</option>
+            ))
+          }
         </select>      
       </div>
 
