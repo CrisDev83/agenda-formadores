@@ -1,5 +1,5 @@
 // Obtém a URL da API (do Google Apps Script Web App) definida no arquivo de ambiente (.env)
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = 'https://script.google.com/macros/s/AKfycbzzKmPcseRHE4ay3O98iuIX1Hqeigvc3WDSS49fK6SWNvUxYEV9sMEnNDgxQ5zJWp-Emg/exec';
 
 // Função assíncrona principal responsável por realizar todas as chamadas HTTP para o backend
 export async function apiCall(paramsObj = {}) {
@@ -23,17 +23,7 @@ export async function apiCall(paramsObj = {}) {
     }
   });
 
-  // 1. Converte os dados em Query Parameters na URL (método GET) para evitar requisições OPTIONS e bloqueios de CORS/Proxy do Apps Script
-  const queryParams = new URLSearchParams({
-    ...formattedParams,
-    _t: Date.now() // Parâmetro timestamp para evitar que o navegador armazene a resposta em cache (Anti-cache)
-  }).toString();
-
-  // Garante a concatenação correta do caractere '?' ou '&' na URL conforme necessário
-  const fullUrl = API_URL.includes('?')
-    ? `${API_URL}&${queryParams}`
-    : `${API_URL}?${queryParams}`;
-
+ 
   // Cria um controlador de cancelamento para implementar um timeout customizado
   const controller = new AbortController();
   // Define o tempo limite máximo de espera para 50 segundos (adequado para possíveis inicializações lentas do Google Apps Script)
@@ -41,12 +31,15 @@ export async function apiCall(paramsObj = {}) {
 
   try {
     // Executa a requisição HTTP GET para a URL montada
-    const response = await fetch(fullUrl, {
-      method: 'GET',
-      redirect: 'follow', // Segue redirecionamentos automáticos (necessário para a infraestrutura do Google Apps Script)
-      headers: { 'Accept': 'application/json' },
-      signal: controller.signal // Associa o sinal do AbortController à requisição
-    });
+    const response = await fetch(API_URL, {
+  method: 'POST',
+  redirect: 'follow',
+  headers: {
+    'Content-Type': 'text/plain;charset=utf-8',
+  },
+  body: JSON.stringify(formattedParams), // Envia os parâmetros no corpo da requisição em vez da URL
+  signal: controller.signal
+});
 
     // Cancela o timer de timeout caso a requisição responda antes dos 50 segundos
     clearTimeout(timeoutId);
