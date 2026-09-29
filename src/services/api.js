@@ -1,72 +1,91 @@
+// Obtém a URL da API (do Google Apps Script Web App) definida no arquivo de ambiente (.env)
 const API_URL = import.meta.env.VITE_API_URL;
 
+// Função assíncrona principal responsável por realizar todas as chamadas HTTP para o backend
 export async function apiCall(paramsObj = {}) {
+  // Verifica se a URL da API está configurada e se não é o placeholder padrão de exemplo
   if (!API_URL || API_URL.includes('SUA_URL_DA_WEB_APP_AQUI')) {
     throw new Error('URL da API não configurada. Verifique as variáveis de ambiente (.env).');
   }
 
-  // Serializa parâmetros complexos (Arrays ou Objetos) para JSON strings
+  // Objeto para armazenar os parâmetros após a formatação/serialização
   const formattedParams = {};
+  
+  // Percorre cada chave/propriedade enviada no objeto de parâmetros
   Object.keys(paramsObj).forEach(key => {
     const val = paramsObj[key];
+    // Se o valor for um objeto ou array (e não nulo), converte para uma string JSON
     if (typeof val === 'object' && val !== null) {
       formattedParams[key] = JSON.stringify(val);
     } else if (val !== undefined && val !== null) {
+      // Se for um tipo primitivo (texto, número, booleano), mantém o valor original
       formattedParams[key] = val;
     }
   });
 
-  // 1. Converte os dados em Query Parameters (GET) para evitar bloqueios de CORS/Proxy
+  // 1. Converte os dados em Query Parameters na URL (método GET) para evitar requisições OPTIONS e bloqueios de CORS/Proxy do Apps Script
   const queryParams = new URLSearchParams({
     ...formattedParams,
-    _t: Date.now() // Anti-cache
+    _t: Date.now() // Parâmetro timestamp para evitar que o navegador armazene a resposta em cache (Anti-cache)
   }).toString();
 
+  // Garante a concatenação correta do caractere '?' ou '&' na URL conforme necessário
   const fullUrl = API_URL.includes('?')
     ? `${API_URL}&${queryParams}`
     : `${API_URL}?${queryParams}`;
 
+  // Cria um controlador de cancelamento para implementar um timeout customizado
   const controller = new AbortController();
-  // Timeout de 50s para suportar respostas lentas do Apps Script
+  // Define o tempo limite máximo de espera para 50 segundos (adequado para possíveis inicializações lentas do Google Apps Script)
   const timeoutId = setTimeout(() => controller.abort(), 50000);
 
   try {
+    // Executa a requisição HTTP GET para a URL montada
     const response = await fetch(fullUrl, {
       method: 'GET',
-      redirect: 'follow',
+      redirect: 'follow', // Segue redirecionamentos automáticos (necessário para a infraestrutura do Google Apps Script)
       headers: { 'Accept': 'application/json' },
-      signal: controller.signal
+      signal: controller.signal // Associa o sinal do AbortController à requisição
     });
 
+    // Cancela o timer de timeout caso a requisição responda antes dos 50 segundos
     clearTimeout(timeoutId);
 
+    // Lança um erro se o status HTTP não estiver na faixa de sucesso (200-299)
     if (!response.ok) {
       throw new Error(`Servidor respondeu com status HTTP ${response.status}`);
     }
 
-    // 2. Lê primeiro como texto para evitar crash de parse do JSON caso venha HTML de erro do Google
+    // 2. Lê a resposta primeiro em formato texto puro para evitar falha catastrófica de parse caso o Google retorne uma página HTML de erro
     const text = await response.text();
 
+    // Se o texto retornado começar com '<' (ex: <!DOCTYPE html>), indica que veio uma página de erro/login do Google em vez do JSON esperado
     if (text.trim().startsWith('<')) {
       throw new Error('O Google Apps Script retornou HTML em vez de JSON. Verifique se a implantação do Web App está configurada para "Qualquer pessoa" (Anyone).');
     }
 
+    // Converte a string de texto para o objeto JSON nativo
     const json = JSON.parse(text);
 
+    // Valida o contrato da resposta do backend (espera uma propriedade "ok: true")
     if (!json.ok) {
       throw new Error(json.error || 'Erro na resposta do servidor.');
     }
 
+    // Retorna apenas a propriedade 'data' contida na resposta bem-sucedida
     return json.data;
 
   } catch (err) {
+    // Garante a limpeza do timer de timeout em caso de exceção no bloco try
     clearTimeout(timeoutId);
 
+    // Trata e identifica especificamente o erro de tempo limite excedido (AbortError)
     if (err.name === 'AbortError' || err.message.includes('aborted') || err.message.includes('signal')) {
       console.warn('Requisição cancelada/abortada por tempo limite:', err.message);
       throw new Error('A requisição demorou muito para responder e foi cancelada. Tente novamente.');
     }
 
+    // Propaga qualquer outro erro não tratado
     throw err;
   }
 }

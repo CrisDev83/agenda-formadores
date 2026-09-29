@@ -1,103 +1,115 @@
 /* src/mobile.css - Estilos Gerais e Ajustes Mobile */
 
-/* Estilos Padrão do Header */
+/* Estilos Padrão do Cabeçalho da Aplicação (Header) */
 .app-header {
-  background-color: #1e293b;
-  color: #ffffff;
-  padding: 12px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background-color: #1e293b; /* Cor de fundo escura (Azul Grafite/Slate) */
+  color: #ffffff;            /* Cor do texto em branco */
+  padding: 12px 24px;        /* Espaçamento interno (12px topo/base, 24px nas laterais) */
+  display: flex;             /* Utiliza Flexbox para organizar os elementos lado a lado */
+  justify-content: space-between; /* Mantém as informações do usuário à esquerda e as ações à direita */
+  align-items: center;       /* Centraliza verticalmente os elementos dentro do cabeçalho */
 }
 
+/* Estilo do texto dentro da área de informações do usuário */
 .user-info span {
-  font-size: 0.95rem;
+  font-size: 0.95rem;        /* Define um tamanho de fonte ligeiramente menor que o padrão */
 }
 
+/* Bloco que agrupa as ações do cabeçalho (botões de navegação e logout) */
 .header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: flex;             /* Coloca os botões de ação em linha */
+  align-items: center;       /* Centraliza verticalmente */
+  gap: 12px;                 /* Espaçamento entre o grupo de navegação e o botão de sair */
 }
 
+/* Grupo de botões de navegação no cabeçalho */
 .header-nav {
-  display: flex;
-  gap: 8px;
+  display: flex;             /* Exibe os botões lado a lado */
+  gap: 8px;                  /* Espaçamento entre cada botão de navegação */
 }
 
 /* ==========================================
    REGRAS ESPECÍFICAS PARA TELA MOBILE (< 640px)
    ========================================== */
+/* Media query que entra em ação apenas em telas com largura máxima de 640 pixels (Smartphones) */
 @media (max-width: 640px) {
-  /* 1. Reorganização do Cabeçalho */
+  /* 1. Reorganização do Cabeçalho para Telas Pequenas */
   .app-header {
-    flex-direction: column;
-    padding: 12px 16px;
-    gap: 12px;
-    align-items: stretch;
+    flex-direction: column;   /* Empilha os elementos do cabeçalho na vertical */
+    padding: 12px 16px;       /* Reduz o espaçamento lateral para economizar espaço */
+    gap: 12px;                /* Espaço entre a identificação do usuário e as ações */
+    align-items: stretch;     /* Faz com que os elementos internos ocupem 100% da largura disponível */
   }
 
+  /* Centraliza o texto com o nome/e-mail do usuário no mobile */
   .user-info {
     text-align: center;
   }
 
+  /* Faz a barra de ações ocupar toda a largura e alinha os botões */
   .header-actions {
-    width: 100%;
-    justify-content: space-between;
-    gap: 8px;
+    width: 100%;              /* Ocupa a largura total da tela */
+    justify-content: space-between; /* Distribui os botões uniformemente */
+    gap: 8px;                 /* Reduz o espaçamento entre os botões */
   }
 
+  /* Permite que o bloco de navegação expanda no mobile */
   .header-nav {
-    flex: 1;
+    flex: 1;                  /* Preenche o espaço disponível na barra */
     display: flex;
-    gap: 6px;
+    gap: 6px;                 /* Reduz a distância entre os botões de navegação */
   }
 
+  /* Ajusta os botões de navegação para caberem em telas pequenas */
   .header-nav .btn {
-    flex: 1;
-    padding: 8px 4px;
-    font-size: 0.82rem;
-    text-align: center;
+    flex: 1;                  /* Todos os botões do menu dividem o mesmo tamanho igualmente */
+    padding: 8px 4px;         /* Padding lateral bem pequeno para não quebrar texto */
+    font-size: 0.82rem;       /* Reduz a fonte do texto do botão */
+    text-align: center;       /* Centraliza o texto do botão */
   }
 
+  /* Ajusta o botão de sair (Logout) no mobile */
   .btn-logout {
-    padding: 8px 12px;
-    font-size: 0.82rem;
+    padding: 8px 12px;        /* Mantém um espaçamento lateral ligeiramente maior para fácil toque */
+    font-size: 0.82rem;       /* Reduz o tamanho da fonte */
   }
 
   /* 2. Reorganização do Seletor de Semana (FormadorView) */
   .week-selector {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    gap: 10px !important;
+    display: flex !important;           /* Força a exibição em Flexbox */
+    flex-wrap: wrap !important;         /* Permite que os elementos se dobrem em mais de uma linha se necessário */
+    justify-content: space-between !important; /* Distribui o espaço entre os elementos */
+    align-items: center !important;     /* Alinha verticalmente */
+    gap: 10px !important;               /* Espaçamento entre texto e botões */
   }
 
+  /* Faz o texto da semana ocupar a primeira linha inteira no mobile */
   .week-text {
-    order: 1 !important;
-    width: 100% !important;
-    text-align: center !important;
-    font-weight: bold !important;
-    font-size: 1rem !important;
-    display: block !important;
-    margin-bottom: 4px !important;
+    order: 1 !important;                /* Define o texto para aparecer em primeiro lugar (no topo) */
+    width: 100% !important;             /* Ocupa 100% da largura */
+    text-align: center !important;      /* Centraliza o texto da semana */
+    font-weight: bold !important;       /* Deixa o texto em negrito */
+    font-size: 1rem !important;         /* Tamanho da fonte */
+    display: block !important;          /* Transforma em bloco completo */
+    margin-bottom: 4px !important;      /* Espaço abaixo do texto */
   }
 
+  /* Ajusta os botões de "Anterior" e "Próxima" para ficarem lado a lado abaixo do texto */
   .week-selector button {
-    order: 2 !important;
-    flex: 1 !important;
-    max-width: 48% !important;
+    order: 2 !important;                /* Posiciona os botões logo abaixo do texto da semana */
+    flex: 1 !important;                 /* Faz com que cada botão ocupe metade da largura */
+    max-width: 48% !important;          /* Impede que ultrapassem 48% para garantir que fiquem lado a lado sem quebrar */
   }
 
   /* 3. Reorganização do Contador de Períodos e Copiar Semana */
   .counter-wrapper {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    text-align: center !important;
-    gap: 12px !important;
+    flex-direction: column !important;  /* Empilha o contador de períodos e o botão de copiar na vertical */
+    align-items: stretch !important;    /* Estica os itens para ocuparem a largura total */
+    text-align: center !important;     /* Centraliza a contagem dos períodos */
+    gap: 12px !important;              /* Distância entre o contador e o botão de copiar */
   }
 
+  /* Estica o botão "Copiar semana anterior" para ocupar 100% da largura da tela no celular */
   .counter-wrapper button {
     width: 100% !important;
   }

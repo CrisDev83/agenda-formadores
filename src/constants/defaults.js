@@ -1,3 +1,4 @@
+// Lista estática padrão contendo todos os usuários (Formadores e Administradores) autorizados no sistema
 export const DEFAULT_TEACHERS = [
   { id: '1', nome: 'Rosiani - CRECHE', email: 'rosiane.boeing@edu.garuva.sc.gov.br', perfil: 'Formador' },
   { id: '2', nome: 'Patrícia Leite - PRÉ-ESCOLAR', email: 'patricia.leite@prof.garuva.sc.gov.br', perfil: 'Formador' },
@@ -15,6 +16,7 @@ export const DEFAULT_TEACHERS = [
   { id: '14', nome: 'Arthur - Teste/Teste', email: 'arthur.neto@edu.garuva.sc.gov.br', perfil: 'Admin' }
 ];
 
+// Lista padrão das opções de atividades/compromissos disponíveis para seleção na agenda dos formadores
 export const DEFAULT_ACTIVITIES = [
   { id: 'act_1', nome: 'Formação na Escola' },
   { id: 'act_2', nome: 'Formação Fora da Escola' },

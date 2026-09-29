@@ -1,242 +1,277 @@
+/* Define variáveis globais no CSS (:root) para fácil reuso de cores e consistência visual em todo o app */
 :root {
-  --primary-color: #2563eb;
-  --primary-hover: #1d4ed8;
-  --bg-color: #f8fafc;
-  --card-bg: #ffffff;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --border-color: #e2e8f0;
-  --success-bg: #dcfce7;
-  --success-text: #166534;
-  --danger-bg: #fee2e2;
-  --danger-text: #991b1b;
+  --primary-color: #2563eb;   /* Cor primária (Azul) para botões principais */
+  --primary-hover: #1d4ed8;   /* Cor de destaque ao passar o mouse no botão primário */
+  --bg-color: #f8fafc;        /* Cor do fundo geral da página (Cinza bem claro) */
+  --card-bg: #ffffff;         /* Cor de fundo dos cartões (Branco) */
+  --text-main: #1e293b;       /* Cor dos textos principais (Escuro) */
+  --text-muted: #64748b;      /* Cor dos textos secundários/suaves (Cinza intermediário) */
+  --border-color: #e2e8f0;    /* Cor padrão das bordas e divisores */
+  --success-bg: #dcfce7;      /* Fundo do selo/badge de sucesso (Verde claro) */
+  --success-text: #166534;    /* Texto do selo/badge de sucesso (Verde escuro) */
+  --danger-bg: #fee2e2;       /* Fundo do selo/badge de pendência/erro (Vermelho claro) */
+  --danger-text: #991b1b;     /* Texto do selo/badge de pendência/erro (Vermelho escuro) */
 }
 
+/* Estilização padrão para o corpo da página */
 body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-main);
+  margin: 0;                  /* Remove as margens externas padrão do navegador */
+  padding: 0;                 /* Remove os espaçamentos internos padrão */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* Define a família de fontes nativa do sistema */
+  background-color: var(--bg-color); /* Aplica a cor de fundo padrão */
+  color: var(--text-main);           /* Aplica a cor do texto principal */
 }
 
+/* Container centralizado para limitar a largura máxima da aplicação */
 .container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px 16px;
+  max-width: 900px;           /* Largura máxima central do app */
+  margin: 0 auto;             /* Centraliza o container na tela na horizontal */
+  padding: 24px 16px;         /* Espaçamento interno (topo/base: 24px, laterais: 16px) */
 }
 
+/* Título principal do aplicativo */
 .app-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 24px;
-  text-align: center;
+  font-size: 1.5rem;          /* Tamanho da fonte do título */
+  font-weight: 700;           /* Deixa o texto em negrito */
+  color: var(--text-main);    /* Cor do texto */
+  margin-bottom: 24px;        /* Espaço abaixo do título */
+  text-align: center;         /* Centraliza o título */
 }
 
+/* Estilo do Cartão/Box */
 .card {
-  background-color: var(--card-bg);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border-color);
+  background-color: var(--card-bg); /* Fundo branco */
+  border-radius: 12px;               /* Arredondamento dos cantos */
+  padding: 20px;                     /* Espaçamento interno */
+  margin-bottom: 20px;              /* Distância para o elemento de baixo */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Sombra suave para dar profundidade */
+  border: 1px solid var(--border-color);     /* Borda fina */
 }
 
+/* Rótulo de campos e inputs */
 .label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+  display: block;             /* Ocupa a linha inteira acima do campo */
+  font-size: 0.875rem;        /* Tamanho de fonte reduzido */
+  font-weight: 600;           /* Negrito moderado */
+  color: var(--text-muted);   /* Cor suavizada */
+  margin-bottom: 8px;         /* Distância para o campo abaixo */
 }
 
+/* Campo de seleção (Select Dropdown) */
 .select-input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background-color: #fff;
-  font-size: 0.95rem;
-  color: var(--text-main);
-  outline: none;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
+  width: 100%;                /* Preenche 100% da largura do container pai */
+  padding: 10px 12px;         /* Espaçamento interno para clique confortável */
+  border-radius: 8px;         /* Cantos ligeiramente arredondados */
+  border: 1px solid var(--border-color); /* Borda suave */
+  background-color: #fff;     /* Fundo branco */
+  font-size: 0.95rem;         /* Tamanho da fonte do texto selecionado */
+  color: var(--text-main);    /* Cor do texto */
+  outline: none;              /* Remove o contorno padrão do navegador */
+  transition: border-color 0.2s; /* Transição suave na cor da borda ao focar */
+  box-sizing: border-box;     /* Inclui borda e padding no cálculo do tamanho */
 }
 
+/* Destaque quando o campo de seleção recebe foco (clique) */
 .select-input:focus {
-  border-color: var(--primary-color);
+  border-color: var(--primary-color); /* Altera a borda para a cor primária (azul) */
 }
 
+/* Estrutura do Seletor de Semanas */
 .week-selector {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  display: flex;              /* Alinha os itens em linha (botões + texto) */
+  align-items: center;        /* Centraliza os elementos verticalmente */
+  justify-content: space-between; /* Distribui o espaço entre os botões e o texto da semana */
+  gap: 12px;                  /* Espaçamento mínimo entre os elementos */
 }
 
+/* Texto informativo da Semana de Planejamento selecionada */
 .week-text {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--text-main);
+  font-weight: 600;           /* Texto em negrito */
+  font-size: 1rem;            /* Tamanho de fonte médio */
+  color: var(--text-main);    /* Cor principal */
 }
 
+/* Container do Contador de Períodos Preenchidos */
 .counter-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-color);
+  display: flex;              /* Alinha o rótulo e o valor na mesma linha */
+  justify-content: space-between; /* Coloca o rótulo à esquerda e o valor à direita */
+  align-items: center;        /* Alinha verticalmente */
+  margin-top: 16px;           /* Distância em relação ao topo */
+  padding-top: 16px;          /* Espaço interno superior */
+  border-top: 1px solid var(--border-color); /* Linha divisória superior */
 }
 
+/* Texto do contador */
 .counter-text {
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  font-size: 0.9rem;          /* Tamanho de fonte suave */
+  color: var(--text-muted);   /* Cor cinza intermediária */
 }
 
+/* Valor numérico do contador (ex: 0/10) */
 .counter-value {
-  font-weight: 700;
+  font-weight: 700;           /* Negrito forte */
 }
 
+/* Grade de Dias da Semana */
 .days-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  display: grid;              /* Ativa o modelo de layout em Grade (Grid) */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsividade automática: ajusta colunas dinamicamente com no mínimo 280px */
+  gap: 16px;                  /* Espaçamento entre os cartões dos dias */
+  margin-bottom: 24px;        /* Espaçamento inferior */
 }
 
+/* Cartão individual de cada dia (Segunda a Sexta) */
 .day-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: var(--card-bg); /* Fundo branco */
+  border: 1px solid var(--border-color); /* Borda suave */
+  border-radius: 12px;        /* Cantos arredondados */
+  padding: 16px;              /* Espaçamento interno */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Sombra sutil */
 }
 
+/* Título de cada dia da semana no cartão */
 .day-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 12px;
-  color: var(--text-main);
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: 6px;
+  font-size: 1rem;            /* Tamanho da fonte */
+  font-weight: 600;           /* Negrito */
+  margin-top: 0;               /* Remove margem superior */
+  margin-bottom: 12px;        /* Espaçamento para o primeiro período */
+  color: var(--text-main);    /* Cor do texto */
+  border-bottom: 2px solid var(--border-color); /* Linha divisória abaixo do dia */
+  padding-bottom: 6px;        /* Distância entre o texto e a linha divisória */
 }
 
+/* Bloco referente a cada período (ex: Matutino / Vespertino) */
 .slot-block {
-  margin-bottom: 12px;
+  margin-bottom: 12px;        /* Distância para o próximo bloco de período */
 }
 
+/* Remove a margem do último período dentro do cartão */
 .slot-block:last-child {
   margin-bottom: 0;
 }
 
+/* Rótulo do período (Matutino/Vespertino) */
 .period-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 4px;
+  display: block;             /* Fica em linha própria */
+  font-size: 0.75rem;        /* Fonte menor */
+  font-weight: 700;           /* Negrito */
+  text-transform: uppercase;  /* Converte o texto para letras MAIÚSCULAS */
+  color: var(--text-muted);   /* Cor cinza */
+  margin-bottom: 4px;         /* Distância para o campo de seleção */
 }
 
+/* Estilo Base dos Botões */
 .btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.2s, opacity 0.2s;
+  padding: 8px 16px;          /* Espaçamento interno (topo/base, laterais) */
+  border-radius: 8px;         /* Bordas arredondadas */
+  font-weight: 600;           /* Texto em negrito */
+  font-size: 0.9rem;          /* Tamanho do texto */
+  cursor: pointer;            /* Transforma o cursor na mãozinha ao passar o mouse */
+  border: none;               /* Remove a borda padrão */
+  transition: background-color 0.2s, opacity 0.2s; /* Animação suave nas trocas de estado */
 }
 
+/* Estado desabilitado dos botões */
 .btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  opacity: 0.6;               /* Deixa o botão semi-transparente */
+  cursor: not-allowed;        /* Exibe cursor de bloqueio/ação não permitida */
 }
 
+/* Botão Secundário (Navegação de semana, Copiar, etc.) */
 .btn-secondary {
-  background-color: #f1f5f9;
-  color: #334155;
-  border: 1px solid var(--border-color);
+  background-color: #f1f5f9;  /* Fundo cinza claro */
+  color: #334155;             /* Texto grafite */
+  border: 1px solid var(--border-color); /* Borda suave */
 }
 
+/* Efeito Hover do Botão Secundário */
 .btn-secondary:hover:not(:disabled) {
-  background-color: #e2e8f0;
+  background-color: #e2e8f0;  /* Escurece levemente o fundo ao passar o mouse */
 }
 
+/* Botão Principal de Salvamento da Agenda */
 .btn-save {
-  width: 100%;
-  padding: 14px;
-  background-color: var(--primary-color);
-  color: #fff;
-  font-size: 1rem;
-  margin-top: 12px;
+  width: 100%;                /* Ocupa a largura inteira */
+  padding: 14px;              /* Altura maior para destaque de clique */
+  background-color: var(--primary-color); /* Azul primário */
+  color: #fff;                /* Texto branco */
+  font-size: 1rem;            /* Fonte um pouco maior */
+  margin-top: 12px;           /* Distância superior */
 }
 
+/* Efeito Hover do Botão de Salvar */
 .btn-save:hover:not(:disabled) {
-  background-color: var(--primary-hover);
+  background-color: var(--primary-hover); /* Azul mais escuro no hover */
 }
 
+/* Caixa de mensagem de Carregamento */
 .loading-box {
-  text-align: center;
-  padding: 40px;
-  color: var(--text-muted);
-  font-weight: 500;
+  text-align: center;         /* Centraliza o texto "Carregando dados..." */
+  padding: 40px;              /* Espaçamento interno amplio */
+  color: var(--text-muted);   /* Cor cinza suave */
+  font-weight: 500;           /* Peso médio */
 }
 
-/* Modal e Admin Styles */
+/* --- Modal e Estilos de Administrador --- */
+
+/* Fundo escurecido atrás da janela modal */
 .modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 16px;
+  position: fixed;            /* Fixa a camada sobre toda a tela */
+  top: 0; left: 0; right: 0; bottom: 0; /* Preenche 100% da janela do navegador */
+  background-color: rgba(0, 0, 0, 0.5); /* Fundo preto semi-transparente (50%) */
+  display: flex;              /* Ativa flexbox */
+  justify-content: center;    /* Centraliza a janela do modal na horizontal */
+  align-items: center;        /* Centraliza a janela do modal na vertical */
+  z-index: 1000;              /* Garante que o modal fique por cima de todos os elementos */
+  padding: 16px;              /* Evita que toque as bordas em telas pequenas */
 }
 
+/* Container de conteúdo dentro da janela Modal */
 .modal-content {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 600px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  background-color: #fff;     /* Fundo branco */
+  border-radius: 12px;        /* Arredondamento */
+  padding: 24px;              /* Espaçamento interno */
+  max-width: 600px;           /* Largura máxima da caixa modal */
+  width: 100%;                /* Ocupa a largura total até o limite configurado */
+  max-height: 90vh;           /* Limita a altura a 90% da altura da tela */
+  overflow-y: auto;           /* Adiciona barra de rolagem se o conteúdo ultrapassar a altura */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); /* Sombra projetada */
 }
 
+/* Grade do Painel de Controle (Dashboard) */
 .dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
+  display: grid;              /* Grid responsivo */
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* Distribui os cartões dos formadores em colunas de no mínimo 320px */
+  gap: 16px;                  /* Espaçamento entre cartões */
 }
 
+/* Estilo base dos Selos/Etiquetas de status (Badges) */
 .badge {
-  font-size: 0.75rem;
-  font-weight: bold;
-  padding: 3px 8px;
-  border-radius: 12px;
+  font-size: 0.75rem;        /* Fonte bem pequena */
+  font-weight: bold;          /* Negrito */
+  padding: 3px 8px;           /* Espaçamento interno */
+  border-radius: 12px;        /* Formato de pílula arredondada */
 }
 
+/* Selo de Preenchido / Sucesso */
 .badge-success {
-  background-color: var(--success-bg);
-  color: var(--success-text);
+  background-color: var(--success-bg); /* Fundo verde claro */
+  color: var(--success-text);           /* Texto verde escuro */
 }
 
+/* Selo de Pendente / Incompleto */
 .badge-danger {
-  background-color: var(--danger-bg);
-  color: var(--danger-text);
+  background-color: var(--danger-bg);  /* Fundo vermelho claro */
+  color: var(--danger-text);            /* Texto vermelho escuro */
 }
 
+/* Botão Primário Auxiliar */
 .btn-primary {
-  background-color: var(--primary-color);
-  color: #ffffff;
+  background-color: var(--primary-color); /* Fundo azul */
+  color: #ffffff;                         /* Texto branco */
 }
 
+/* Hover do Botão Primário Auxiliar */
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--primary-hover);
+  background-color: var(--primary-hover); /* Fundo azul escuro */
 }
