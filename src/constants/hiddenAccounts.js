@@ -7,5 +7,7 @@
 // Exporta a constante contendo o array com os e-mails das contas que devem ser ocultadas das listas visíveis
 export const EMAILS_OCULTOS = [
   'cristhian.vieira@edu.garuva.sc.gov.br', // E-mail de conta de Administrador/Dev ocultado das listagens
-  'arthur.neto@edu.garuva.sc.gov.br'        // E-mail de conta de Administrador/Teste ocultado das listagens
+  'arthur.neto@edu.garuva.sc.gov.br',
+  'lucileide@edu.garuva.sc.gov.br',
+  'fabio.oliveira@edu.garuva.sc.gov.br'        // E-mail de conta de Administrador/Teste ocultado das listagens
 ];

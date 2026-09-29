@@ -13,7 +13,10 @@ export const DEFAULT_TEACHERS = [
   { id: '11', nome: 'Evandro - AVALIAÇÕES AF', email: 'evandro.leithold@prof.garuva.sc.gov.br', perfil: 'Formador' },
   { id: '12', nome: 'Adriane - NTE/ Educação Digital', email: 'adriane.galando@edu.garuva.sc.gov.br', perfil: 'Admin' },
   { id: '13', nome: 'Cris Vieira - Dev', email: 'cristhian.vieira@edu.garuva.sc.gov.br', perfil: 'Admin' },
-  { id: '14', nome: 'Arthur - Teste/Teste', email: 'arthur.neto@edu.garuva.sc.gov.br', perfil: 'Admin' }
+  { id: '14', nome: 'Arthur - Admin', email: 'arthur.neto@edu.garuva.sc.gov.br', perfil: 'Admin' },
+  { id: '15', nome: 'Fabio - Admin', email: 'fabio.oliveira@edu.garuva.sc.gov.br', perfil: 'Admin' },
+  { id: '16', nome: 'Lucileide - Admin', email: 'lucileide@edu.garuva.sc.gov.br', perfil: 'Admin' }
+
 ];
 
 // Lista padrão das opções de atividades/compromissos disponíveis para seleção na agenda dos formadores
