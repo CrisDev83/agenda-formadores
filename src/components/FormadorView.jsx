@@ -199,23 +199,23 @@ export default function FormadorView() {
     }
 
     setSaving(true);
-    try {
-      await apiCall({
-        action: 'save',
-        teacher: selectedTeacher,
-        week: currentMonday,
-        slots: slots,
-        revision: revision
-      });
+  try {
+    await apiCall({
+      action: 'save',
+      teacher: selectedTeacher,
+      week: currentMonday,
+      slots: JSON.stringify(slots), // <-- Adicione o JSON.stringify aqui
+      revision: revision
+    });
 
-      alert('Planejamento salvo com sucesso!');
-      setIsLocked(true);
-      setIsDirty(false);
-    } catch (err) {
-      alert(`Falha ao salvar: ${err.message}`);
-    } finally {
-      setSaving(false);
-    }
+    alert('Planejamento salvo com sucesso!');
+    setIsLocked(true);
+    setIsDirty(false);
+  } catch (err) {
+    alert(`Falha ao salvar: ${err.message}`);
+  } finally {
+    setSaving(false);
+  }
   }
 
   // Cálculos visuais para contagem de preenchimento e exibição de intervalo da semana
